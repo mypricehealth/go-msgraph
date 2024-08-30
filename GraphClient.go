@@ -65,8 +65,8 @@ func NewGraphClient(tenantID, applicationID, clientSecret string) (*GraphClient,
 // for azureADAuthEndpoint and serviceRootEndpoint are available via msgraph.azureADAuthEndpoint*  and msgraph.ServiceRootEndpoint*
 //
 // For available endpoints from Microsoft, see documentation:
-//   * Authentication Endpoints: https://docs.microsoft.com/en-us/azure/active-directory/develop/authentication-national-cloud#azure-ad-authentication-endpoints
-//   * Service Root Endpoints: https://docs.microsoft.com/en-us/graph/deployments#microsoft-graph-and-graph-explorer-service-root-endpoints
+//   - Authentication Endpoints: https://docs.microsoft.com/en-us/azure/active-directory/develop/authentication-national-cloud#azure-ad-authentication-endpoints
+//   - Service Root Endpoints: https://docs.microsoft.com/en-us/graph/deployments#microsoft-graph-and-graph-explorer-service-root-endpoints
 //
 // Returns an error if the token cannot be initialized. This func does not have
 // to be used to create a new GraphClient.
@@ -154,7 +154,7 @@ func (g *GraphClient) makeDELETEAPICall(apiCall string, reqParams getRequestPara
 
 // makeAPICall performs an API-Call to the msgraph API. This func uses sync.Mutex to synchronize all API-calls.
 //
-// Parameter httpMethod may be http.MethodGet, http.MethodPost or http.MethodPatch
+// # Parameter httpMethod may be http.MethodGet, http.MethodPost or http.MethodPatch
 //
 // Parameter body may be nil to not provide any content - e.g. when using a http GET request.
 func (g *GraphClient) makeAPICall(apiCall string, httpMethod string, reqParams getRequestParams, body io.Reader, v interface{}) error {
@@ -232,7 +232,10 @@ func (g *GraphClient) performRequest(req *http.Request, v interface{}) error {
 	if req.Method == http.MethodDelete || req.Method == http.MethodPatch {
 		return nil
 	}
-	return json.Unmarshal(body, &v) // return the error of the json unmarshal
+	if len(body) > 0 && v != nil {
+		return json.Unmarshal(body, &v) // return the error of the json unmarshal
+	}
+	return nil
 }
 
 // ListUsers returns a list of all users
